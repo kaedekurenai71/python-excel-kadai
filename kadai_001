@@ -1,0 +1,46 @@
+import openpyxl
+from datetime import datetime
+
+workbook = openpyxl.Workbook()
+
+ws = workbook.active
+
+today = datetime.today()
+backup_filename = f"backup_{today.strftime('%Y%m%d')}.xlsx"
+
+ws['B2'] = '請求書'
+ws['B4'] = '株式会社ABC'
+ws['B5'] = '〒101-0022 東京都千代田区神田練塀町300'
+ws['B6'] = 'TEL:03-1234-5678 FAX:03-1234-5678'
+ws['B7'] = '担当者名:鈴木一郎 様'
+ws['F4'] = 'No'
+ws['F5'] = '日付'
+ws['G4'] = '0001'
+ws['G5'] = today.strftime('%Y/%m/%d')
+
+ws.column_dimensions['E'].width =13
+
+header = ['商品名', '数量', '単価', '金額']
+
+for i in range(0,len(header)):
+  ws.cell(row=10, column=i+2, value=header[i])
+
+data = [
+    ['', '商品A', 2, 10000, 20000],
+    ['', '商品B', 1, 15000, 15000],
+]
+
+for row in data:
+    ws.append(row)
+
+ws['E13'] = '=SUM(E11:E12)'
+
+ws['B15'] = '小計'
+ws['B16'] = '消費税'
+ws['B17'] = '合計'
+
+ws['E15'] = '=E13'
+ws['E16'] = '=E15*0.1'
+ws['E17'] = '=E15+E16'
+
+workbook.save(backup_filename)
