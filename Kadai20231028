@@ -1,0 +1,119 @@
+import openpyxl
+from datetime import datetime
+from openpyxl.styles import Border, Side
+from openpyxl.styles import PatternFill
+from openpyxl.styles import Font
+from openpyxl.styles import Alignment
+
+workbook = openpyxl.Workbook()
+ws = workbook.active
+
+today = datetime.today()
+backup_filename = f"課題_{today.strftime('%Y%m%d_%H%M')}.xlsx"
+
+for i in range(1,5):
+  ws.cell(row=1, column=1+i, value=f"列{i}")
+
+for i in range(1,11):
+  ws.cell(row=1+i, column=1, value=f"行{i}")
+
+for i in range(1,11):
+  ws.cell(row=1+i, column=2, value=i*10+1)
+  ws.cell(row=1+i, column=3, value=i*10+2)
+  ws.cell(row=1+i, column=4, value=i*10+3)
+  ws.cell(row=1+i, column=5, value=i*10+4)
+
+ws.append(['合計','=SUM(B2:B11)', '=SUM(C2:C11)', '=SUM(D2:D11)', '=SUM(E2:E11)'])
+
+thin_border = Border(left=Side(style='thin'),
+                    right=Side(style='thin'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin'))
+
+for row in ws['A1:E12']:
+  for cell in row:
+    cell.border = thin_border
+
+thick_border = Side(style='thick')
+double_border = Side(style='double')
+
+ws['A1'].border =Border(left=Side(style='thick'),
+                       right=Side(style='thin'),
+                       top=Side(style='thick'),
+                       bottom=Side(style='thin'))
+
+thick_top = Border(left=Side(style='thin'),
+                  right=Side(style='thin'),
+                  top=Side(style='thick'),
+                  bottom=Side(style='thin'))
+
+for row in ws['B1:D1']:
+  for cell in row:
+    cell.border = thick_top
+
+ws['E1'].border =Border(left=Side(style='thin'),
+                       right=Side(style='thick'),
+                       top=Side(style='thick'),
+                       bottom=Side(style='thin'))
+
+thick_left = Border(left=Side(style='thick'),
+                   right=Side(style='thin'),
+                   top=Side(style='thin'),
+                   bottom=Side(style='thin'))
+
+for row in ws['A2:A11']:
+  for cell in row:
+    cell.border = thick_left
+
+thick_right = Border(left=Side(style='thin'),
+                    right=Side(style='thick'),
+                    top=Side(style='thin'),
+                    bottom=Side(style='thin'))
+
+for row in ws['E2:E11']:
+  for cell in row:
+    cell.border = thick_right
+
+ws['A12'].border =Border(left=Side(style='thick'),
+                        right=Side(style='thin'),
+                        top=Side(style='double'),
+                        bottom=Side(style='thick'))
+
+thick_bottom = Border(left=Side(style='thin'),
+                     right=Side(style='thin'),
+                     top=Side(style='double'),
+                     bottom=Side(style='thick'))
+
+for row in ws['B12:D12']:
+  for cell in row:
+    cell.border = thick_bottom
+
+ws['E12'].border =Border(left=Side(style='thin'),
+                        right=Side(style='thick'),
+                        top=Side(style='double'),
+                        bottom=Side(style='thick'))
+
+red_back = PatternFill(patternType='solid', fgColor='FF0000')
+
+for row in ws['A12:E12']:
+  for cell in row:
+    cell.fill = red_back
+
+white_font = Font(color='FFFFFF')
+
+for row in ws['A12:E12']:
+  for cell in row:
+    cell.font = white_font
+
+center_ali = Alignment(horizontal='center')
+
+for row in ws['A1:E1']:
+  for cell in row:
+    cell.alignment = center_ali
+
+for row in ws['A2:A12']:
+  for cell in row:
+    cell.alignment = center_ali
+
+workbook.save(backup_filename)
+
