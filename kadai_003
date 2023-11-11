@@ -1,0 +1,84 @@
+import openpyxl as ox
+import pandas as pd
+from openpyxl.styles import PatternFill, Font, Border, Side, Alignment
+
+df1 = pd.read_excel('2022_年間売上表.xlsx')
+
+df2 = pd.read_excel('2023_年間売上表.xlsx')
+
+df3 = pd.concat([df1, df2], axis=0)
+
+grouped = df3.groupby(['商品', '売上年'])['金額（千円）'].sum()
+
+writer = pd.ExcelWriter('売上集計表1.xlsx')
+
+grouped.to_excel(writer, sheet_name='Sheet1', index=True)
+
+writer.close()
+
+workbook = ox.load_workbook('売上集計表1.xlsx')
+
+ws = workbook.active
+
+gray_back = PatternFill(patternType='solid', fgColor='F2F2F2')
+
+for row in ws['A1:C1']:
+  for cell in row:
+    cell.fill = gray_back
+
+ws.unmerge_cells('A2:A3')
+ws.unmerge_cells('A5:A6')
+ws.unmerge_cells('A7:A8')
+ws.unmerge_cells('A10:A11')
+ws.unmerge_cells('A12:A13')
+ws.unmerge_cells('A14:A15')
+ws.unmerge_cells('A16:A17')
+
+ws['A3'] = '=A2'
+ws['A6'] = '=A5'
+ws['A8'] = '=A7'
+ws['A11'] = '=A10'
+ws['A11'] = '=A10'
+ws['A13'] = '=A12'
+ws['A15'] = '=A14'
+ws['A17'] = '=A16'
+
+right_ali = Alignment(horizontal='right')
+left_ali = Alignment(horizontal='left')
+
+for row in ws['A2:A17']:
+  for cell in row:
+    cell.alignment = left_ali
+
+for row in ws['B2:C17']:
+  for cell in row:
+    cell.alignment = right_ali
+
+ws.column_dimensions['A'].width =15
+ws.column_dimensions['C'].width =12
+
+font = Font(bold=False)
+
+for row in ws['A2:C17']:
+  for cell in row:
+    cell.font = font
+
+thin_top = Border(left=Side(style=None),
+                  right=Side(style=None),
+                  top=Side(style='thin'),
+                  bottom=Side(style=None))
+
+for row in ws['A2:C2']:
+  for cell in row:
+    cell.border = thin_top
+
+border_no = Border(left=Side(style=None),
+                  right=Side(style=None),
+                  top=Side(style=None),
+                  bottom=Side(style=None))
+
+for row in ws['A3:C17']:
+  for cell in row:
+    cell.border = border_no
+
+workbook.save('売上集計表.xlsx')
