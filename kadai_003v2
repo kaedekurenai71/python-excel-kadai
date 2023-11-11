@@ -1,0 +1,49 @@
+import openpyxl as ox
+import pandas as pd
+from openpyxl.styles import PatternFill, Font, Border, Side, Alignment
+
+# データの読み込みと結合
+df1 = pd.read_excel('2022_年間売上表.xlsx')
+df2 = pd.read_excel('2023_年間売上表.xlsx')
+df3 = pd.concat([df1, df2], axis=0)
+
+# 売上の集計
+grouped = df3.groupby(['商品', '売上年'])['金額（千円）'].sum()
+grouped.to_excel('売上集計表1.xlsx', sheet_name='Sheet1', index=True)
+
+# Excelファイルの読み込み
+workbook = ox.load_workbook('売上集計表1.xlsx')
+ws = workbook.active
+
+# スタイルの設定
+gray_back = PatternFill(patternType='solid', fgColor='F2F2F2')
+right_ali = Alignment(horizontal='right')
+left_ali = Alignment(horizontal='left')
+font = Font(bold=False)
+thin_top = Border(top=Side(style='thin'))
+border_no = Border()
+
+# セルの結合解除と値のコピー
+for i in [2, 5, 7, 10, 12, 14, 16]:
+        ws.unmerge_cells(start_row=i, start_column=1, end_row=i+1, end_column=1)
+        ws.cell(row=i+1, column=1, value=f'={ox.utils.get_column_letter(1)}{i}')
+
+# スタイルの適用
+for cell in ws[1]:
+    cell.fill = gray_back
+
+for row in ws.iter_rows(min_row=2, max_col=3, max_row=17):
+    for cell in row:
+        cell.border = border_no
+        cell.font = font
+        if cell.column == 1:
+            cell.alignment = left_ali
+        else:
+            cell.alignment = right_ali
+
+# 列幅の設定
+ws.column_dimensions['A'].width = 15
+ws.column_dimensions['C'].width = 12
+
+# ファイルの保存
+workbook.save('売上集計表.xlsx')
